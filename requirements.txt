@@ -1,0 +1,5 @@
+flask-sqlalchemy
+flask_migrate
+flask_script
+#flask-mail
+

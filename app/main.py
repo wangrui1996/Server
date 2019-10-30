@@ -85,9 +85,39 @@ def upload():
                 result = uploadfile(name=filename, type=mime_type, size=0, not_allowed_msg="File type not allowed")
 
             else:
+                # detect
+                filestr = files.read()
+                # convert string data to numpy array
+                npimg = numpy.fromstring(filestr, numpy.uint8)
+                # convert numpy array to image
+                img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+                def progress(image):
+                    ret, image = detect_image(image)
+                    h, w, _ = image.shape
+                    import cv2
+                    img_pil = Image.fromarray(image)
+                    draw = ImageDraw.Draw(img_pil)
+                    size = int(min(h, w) / 10)
+                    print("3: ", size)
+                    font = ImageFont.truetype(fontpath, size)
+                    global text_str
+                    if ret:
+                        text_str = "包裹破损"
+                    else:
+                        text_str = "没有破损"
+                    draw.text((int(w / 8), int(h / 4)), text_str, font=font, fill=(b, g, r, a))
+                    image = np.array(img_pil)
+
+                    # image = cv2.putText(image, "{} Torn".format(ret), (0, 100), cv2.FONT_HERSHEY_COMPLEX, 2.0, (0, 255, 0), 5)
+                    return text_str, image
+
+                text_str, img = progress(img)
+                filename = "{}_{}.jpg".format(filename.split(".")[0], text_str)
+
                 # save file to disk
                 uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                files.save(uploaded_file_path)
+                cv2.imwrite(uploaded_file_path, img)
+               # files.save(uploaded_file_path)
 
                 # create thumbnail after saving
                 if mime_type.startswith('image'):

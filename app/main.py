@@ -102,9 +102,9 @@ def upload():
                     font = ImageFont.truetype(fontpath, size)
                     global text_str
                     if ret:
-                        text_str = "包裹破损"
+                        text_str = "have"
                     else:
-                        text_str = "没有破损"
+                        text_str = "no"
                     draw.text((int(w / 8), int(h / 4)), text_str, font=font, fill=(b, g, r, a))
                     image = np.array(img_pil)
 

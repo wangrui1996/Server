@@ -7,6 +7,9 @@ import numpy
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, make_response
 from flask_bootstrap import Bootstrap
 from werkzeug import secure_filename
+import multiprocessing
+
+lock = multiprocessing.Lock()
 
 import cv2
 import numpy as np
@@ -92,7 +95,8 @@ def upload():
                 # convert numpy array to image
                 img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
                 def progress(image):
-                    ret, image = detect_image(image)
+                    with lock:
+                        ret, image = detect_image(image)
                     h, w, _ = image.shape
                     import cv2
                     img_pil = Image.fromarray(image)

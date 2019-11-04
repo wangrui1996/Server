@@ -234,4 +234,5 @@ def upload_files():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port =8080, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port =8080, debug=False, threaded=True, ssl_context='adhoc')
+    #app.run(host='0.0.0.0', port=8080, debug=False, threaded=True)

@@ -1,10 +1,11 @@
 import cv2
 import torn_detection.Detect as Detect
-model_path = "./torn_detection/models/detect.tflite"
+detect_model_path = "./torn_detection/models/detect.tflite"
+classifier_model_path = "./torn_detection/models/classifier.tflite"
 #image_path = "demo.jpg"
 #image = cv2.imread(image_path)
 #input_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-detect = Detect.Detect(model_path)
+detect = Detect.Detect(detect_model_path, classifier_model_path)
 def detect_image(image, score=0.5):
     detect.detect(image)
     return detect.draw_image(image, score)

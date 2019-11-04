@@ -1,17 +1,16 @@
 import os
 
 class uploadfile():
-    def __init__(self, name, type=None, size=None, torn="包裹有破损", not_allowed_msg=''):
+    def __init__(self, name, type=None, size=None, not_allowed_msg=''):
         self.name = name
         self.type = type
         self.size = size
         self.not_allowed_msg = not_allowed_msg
         self.url = "data/%s" % name
-        self.thumbnail_url = "data/thumbnail/%s" % name
+        self.thumbnail_url = "thumbnail/%s" % name
         self.delete_url = "delete/%s" % name
         self.delete_type = "DELETE"
         self.torn = None
-
 
     def is_image(self):
         fileName, fileExtension = os.path.splitext(self.name.lower())

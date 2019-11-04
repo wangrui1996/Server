@@ -21,11 +21,7 @@ ALLOWED_EXTENSIONS = set(['jpg', 'mp4', 'zip'])
 
 frequency = cv2.getTickFrequency()
 app = Flask(__name__)
-
-app.config['SECRET_KEY'] = 'hard to guess string'
-app.config['UPLOAD_FOLDER'] = 'data/'
-app.config['THUMBNAIL_FOLDER'] = 'data/'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 * 50 # 16 * 50 MB
+app.config.from_pyfile('config.py')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'zip'])
 IGNORED_FILES = set(['.gitignore'])
 
@@ -131,7 +127,7 @@ def upload():
                 size = os.path.getsize(uploaded_file_path)
 
                 # return json for js call back
-                result = uploadfile(name=filename, type=mime_type, size=size, torn="有破损")
+                result = uploadfile(name=filename, type=mime_type, size=size)
 
             return simplejson.dumps({"files": [result.get_file()]})
 
@@ -171,11 +167,13 @@ def delete(filename):
 # serve static files
 @app.route("/thumbnail/<string:filename>", methods=['GET'])
 def get_thumbnail(filename):
-    return send_from_directory(app.config['THUMBNAIL_FOLDER'], filename=filename)
+    return send_from_directory("/home/rui/files/PycharmProjects/TornServe/app/uploads/thumbnail", filename)
+    #return send_from_directory(app.config['THUMBNAIL_FOLDER'], filename=filename)
 
 
 @app.route("/data/<string:filename>", methods=['GET'])
 def get_file(filename):
+    print("data/filename", filename)
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER']), filename=filename)
 
 

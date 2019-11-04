@@ -78,10 +78,10 @@ class Detect:
             region = image[ymin:ymax, xmin:xmax, :].copy()
             region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
             if self.classfier.progress(region) == 1:
-                cv2.putText(image, 'Is Torn', (xmin, ymax), cv2.FONT_HERSHEY_COMPLEX, 5, (0, 255, 255), 12)
+                cv2.putText(image, 'Have', (xmin, ymax), cv2.FONT_HERSHEY_COMPLEX, 5, (0, 255, 255), 12)
                 have_target = True
             else:
-                cv2.putText(image, 'Is Not Torn', (xmin, ymax), cv2.FONT_HERSHEY_COMPLEX, 5, (0, 255, 255), 12)
+                cv2.putText(image, 'No', (xmin, ymax), cv2.FONT_HERSHEY_COMPLEX, 5, (0, 255, 255), 12)
             image = cv2.rectangle(image, (xmin, ymin), (xmax , ymax), (0, 0, 255), int(min(img_h,img_w) / 100))
 #            print(self.targets_label[0][idx])
         return have_target, image

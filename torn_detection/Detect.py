@@ -70,10 +70,10 @@ class Detect:
                 print(self.targets_score[0][idx])
                 break
             def get_Absolute_coordinates(Relative_coordinates, image_height, image_width):
-                return int(Relative_coordinates[1] * image_width), \
-                int(Relative_coordinates[0] * image_height), \
-                int(Relative_coordinates[3] * image_width), \
-                int(Relative_coordinates[2] * image_height)
+                return max(0, int(Relative_coordinates[1] * image_width)), \
+                max(0, int(Relative_coordinates[0] * image_height)), \
+                min(image_width, int(Relative_coordinates[3] * image_width)), \
+                min(image_height, int(Relative_coordinates[2] * image_height))
             xmin, ymin, xmax, ymax = get_Absolute_coordinates(self.targets_positions[0][idx], img_h, img_w)
             region = image[ymin:ymax, xmin:xmax, :].copy()
             region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)

@@ -105,7 +105,7 @@ def upload():
                         text_str = "have"
                     else:
                         text_str = "no"
-                    draw.text((int(w / 8), int(h / 4)), text_str, font=font, fill=(b, g, r, a))
+                    #draw.text((int(w / 8), int(h / 4)), text_str, font=font, fill=(b, g, r, a))
                     image = np.array(img_pil)
 
                     # image = cv2.putText(image, "{} Torn".format(ret), (0, 100), cv2.FONT_HERSHEY_COMPLEX, 2.0, (0, 255, 0), 5)

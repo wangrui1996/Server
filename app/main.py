@@ -167,14 +167,14 @@ def delete(filename):
 # serve static files
 @app.route("/thumbnail/<string:filename>", methods=['GET'])
 def get_thumbnail(filename):
-    return send_from_directory("/home/rui/files/PycharmProjects/TornServe/app/uploads/thumbnail", filename)
+    return send_from_directory(os.path.join(app.config['THUMBNAIL_FOLDER']), filename)
     #return send_from_directory(app.config['THUMBNAIL_FOLDER'], filename=filename)
 
 
 @app.route("/data/<string:filename>", methods=['GET'])
 def get_file(filename):
     print("data/filename", filename)
-    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER']), filename=filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename=filename)
 
 
 @app.route('/torn', methods=['GET', 'POST'])

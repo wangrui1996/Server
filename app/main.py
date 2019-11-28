@@ -14,7 +14,7 @@ lock = multiprocessing.Lock()
 import cv2
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
-from torn_detection.detection_api import detect_image
+from torn_detection.detection_api import detect_imagev2
 from lib.upload_file import uploadfile
 
 ALLOWED_EXTENSIONS = set(['jpg', 'mp4', 'zip'])
@@ -90,9 +90,10 @@ def upload():
                 npimg = numpy.fromstring(filestr, numpy.uint8)
                 # convert numpy array to image
                 img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 def progress(image):
                     with lock:
-                        ret, image = detect_image(image)
+                        ret, image = detect_imagev2(image)
                     h, w, _ = image.shape
                     import cv2
                     img_pil = Image.fromarray(image)
@@ -190,7 +191,7 @@ def tornDetection():
             # convert numpy array to image
             img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
             def progress(image):
-                ret, image = detect_image(image)
+                ret, image = detect_imagev2(image)
                 h,w,_ = image.shape
                 import cv2
                 img_pil = Image.fromarray(image)
@@ -234,5 +235,5 @@ def upload_files():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port =8080, debug=False, threaded=True, ssl_context='adhoc')
+    app.run(host='0.0.0.0', port =8080, debug=False, threaded=True)
     #app.run(host='0.0.0.0', port=8080, debug=False, threaded=True)

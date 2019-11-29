@@ -190,6 +190,7 @@ def tornDetection():
             npimg = numpy.fromstring(filestr, numpy.uint8)
             # convert numpy array to image
             img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             def progress(image):
                 ret, image = detect_imagev2(image)
                 h,w,_ = image.shape

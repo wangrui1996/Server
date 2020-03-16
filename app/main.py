@@ -6,7 +6,7 @@ import traceback
 import numpy
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, make_response
 from flask_bootstrap import Bootstrap
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 import multiprocessing
 
 lock = multiprocessing.Lock()
@@ -70,8 +70,8 @@ def create_thumbnail(image):
         return False
 
 
-@app.route("/upload", methods=['GET', 'POST'])
-def upload():
+@app.route("/upload_back", methods=['GET', 'POST'])
+def upload_back():
     if request.method == 'POST':
         files = request.files['file']
 
@@ -100,7 +100,7 @@ def upload():
                     draw = ImageDraw.Draw(img_pil)
                     size = int(min(h, w) / 10)
                     print("3: ", size)
-                    font = ImageFont.truetype(fontpath, size)
+                    #font = ImageFont.truetype(fontpath, size)
                     global text_str
                     if ret:
                         text_str = "have"
@@ -147,6 +147,79 @@ def upload():
         return simplejson.dumps({"files": file_display})
 
     return redirect(url_for('index'))
+
+from ocrs.model import predict
+@app.route("/upload", methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        files = request.files['file']
+
+        if files:
+            filename = secure_filename(files.filename)
+            filename = gen_file_name(filename)
+            mime_type = files.content_type
+
+            if not allowed_file(files.filename):
+                result = uploadfile(name=filename, type=mime_type, size=0, not_allowed_msg="File type not allowed")
+
+            else:
+                # detect
+                filestr = files.read()
+                # convert string data to numpy array
+                npimg = numpy.fromstring(filestr, numpy.uint8)
+                # convert numpy array to image
+                img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                def progress(image):
+                    with lock:
+                        img = Image.fromarray(image).convert("L")
+                        ret = predict(img)
+                        print(ret)
+                        tmp = "image_"
+                        for i in ret:
+                            if i in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                                tmp+=i
+                        ret = tmp+".jpg"
+                    # image = cv2.putText(image, "{} Torn".format(ret), (0, 100), cv2.FONT_HERSHEY_COMPLEX, 2.0, (0, 255, 0), 5)
+                    return ret, image
+
+                text_str, img = progress(img)
+                filename = text_str
+
+                # save file to disk
+                uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                cv2.imwrite(uploaded_file_path, img)
+               # files.save(uploaded_file_path)
+
+                # create thumbnail after saving
+                if mime_type.startswith('image'):
+                    create_thumbnail(filename)
+
+                # get file size after saving
+                size = os.path.getsize(uploaded_file_path)
+
+                # return json for js call back
+                result = uploadfile(name=filename, type=mime_type, size=size)
+
+            return simplejson.dumps({"files": [result.get_file()]})
+
+    if request.method == 'GET':
+        # get all file in ./data directory
+        files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if
+                 os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f)) and f not in IGNORED_FILES]
+
+        file_display = []
+
+        for f in files:
+            size = os.path.getsize(os.path.join(app.config['UPLOAD_FOLDER'], f))
+            file_saved = uploadfile(name=f, size=size)
+            file_display.append(file_saved.get_file())
+
+        return simplejson.dumps({"files": file_display})
+
+    return redirect(url_for('index'))
+
+
 
 @app.route("/delete/<string:filename>", methods=['DELETE'])
 def delete(filename):

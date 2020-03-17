@@ -250,6 +250,60 @@ def get_file(filename):
     print("data/filename", filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename=filename)
 
+@app.route('/dight', methods=['GET', 'POST'])
+def DightDetection():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = file.filename
+        #    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filestr = file.read()
+            # convert string data to numpy array
+            npimg = numpy.fromstring(filestr, numpy.uint8)
+            # convert numpy array to image
+            img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            h,w,_=img.shape
+
+            def progress(image):
+                with lock:
+                    img = Image.fromarray(image).convert("L")
+                    ret = predict(img)
+                    print(ret)
+                    tmp = ""
+                    for i in ret:
+                        if i in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                            tmp += i
+                    ret = tmp
+                # image = cv2.putText(image, "{} Torn".format(ret), (0, 100), cv2.FONT_HERSHEY_COMPLEX, 2.0, (0, 255, 0), 5)
+                return ret, image
+
+            text_str, img = progress(img)
+            print("rec: ", text_str)
+            print("height: ",h)
+            cv2.putText(img, text_str,(0,h), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255))
+            cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            img_encode = cv2.imencode('.jpg', img)[1]
+            # imgg = cv2.imencode('.png', img)
+
+            data_encode = np.array(img_encode)
+
+            response = make_response(data_encode.tostring())
+            response.headers['Content-Type'] = 'image/png'
+            return response
+    #        return redirect(url_for('face_upload_img',filename=filename))
+    return '''
+        <!doctype html>
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form action="" method=post enctype=multipart/form-data>
+        <p><input type=file name=file>
+           <input type=submit value=Upload>
+        </form>
+        '''
+
+
 
 @app.route('/torn', methods=['GET', 'POST'])
 def tornDetection():

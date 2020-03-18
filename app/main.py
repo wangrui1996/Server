@@ -281,16 +281,20 @@ def DightDetection():
             text_str, img = progress(img)
             print("rec: ", text_str)
             print("height: ",h)
-            cv2.putText(img, text_str,(0,h), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255))
+            cv2.putText(img, text_str,(0,h), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
             cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             img_encode = cv2.imencode('.jpg', img)[1]
             # imgg = cv2.imencode('.png', img)
 
             data_encode = np.array(img_encode)
-
-            response = make_response(data_encode.tostring())
-            response.headers['Content-Type'] = 'image/png'
+            # 返回图片
+            #response = make_response(data_encode.tostring())
+            #response.headers['Content-Type'] = 'image/png'
+            import json
+            data = {"result": text_str}
+            response = make_response(json.dumps(data))
+            response.headers["Content-Type"] = "application/json"
             return response
     #        return redirect(url_for('face_upload_img',filename=filename))
     return '''

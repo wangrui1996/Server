@@ -11,11 +11,8 @@ import os
 #    detect.detect(image)
 #    return detect.draw_image(image, score)
 
-
-
-
-package_detect_path = os.path.join(os.path.pardir(__file__),"models", "package.tflite")
-torn_detect_path =  os.path.join(os.path.pardir(__file__),"models", "torn.tflite")
+package_detect_path = os.path.join(os.path.dirname(__file__),"models", "package.tflite")
+torn_detect_path =  os.path.join(os.path.dirname(__file__),"models", "torn.tflite")
 
 from torn_detection.tfLite import Detect
 package_detect = Detect(package_detect_path)

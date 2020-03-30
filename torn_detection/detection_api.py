@@ -1,4 +1,5 @@
 import cv2
+import os
 #import torn_detection.Detect as Detect
 #detect_model_path = "./torn_detection/models/detect.tflite"
 #classifier_model_path = "./torn_detection/models/classifier.tflite"
@@ -10,8 +11,11 @@ import cv2
 #    detect.detect(image)
 #    return detect.draw_image(image, score)
 
-package_detect_path = './torn_detection/models/package.tflite'
-torn_detect_path = "./torn_detection/models/torn.tflite"
+
+
+
+package_detect_path = os.path.join(os.path.pardir(__file__),"models", "package.tflite")
+torn_detect_path =  os.path.join(os.path.pardir(__file__),"models", "torn.tflite")
 
 from torn_detection.tfLite import Detect
 package_detect = Detect(package_detect_path)
